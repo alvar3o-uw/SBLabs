@@ -12,7 +12,7 @@ type ExerciseInstance = {
     sets: ExerciseSet[];
 };
 
-type ExerciseSet = {
+export type ExerciseSet = {
     weight: number,
     reps: number,
     rir: number,

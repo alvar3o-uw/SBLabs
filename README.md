@@ -8,4 +8,21 @@ This is my first software project, and I want it to be a learning experience. I 
 
 ## Current status
 
-SBLabs is just getting started. There is no working app yet. The first goal is an installed phone app where I can save a workout and view it again. I will build it in small steps, learn the tools as I need them, and record important decisions along the way.
+SBLabs currently has an interactive workout screen where I can enter weight, reps, and RIR, add sets, and remove sets. It also contains TypeScript logic for selecting an exercise's best set and comparing progress with its previous session; that logic is not yet connected to the interface.
+
+Workout data currently resets when the page refreshes. My next goal is to save workouts and view them again, eventually using the app from my iPhone Home Screen. Food tracking is planned for later.
+
+## Tech stack
+
+Next.js, React, TypeScript, and plain CSS.
+
+## Run locally
+
+From the SBLabs folder, run `npm install` to install the dependencies, then `npm run dev` to start the development server. Open http://localhost:3000 to view the page. Edits to `app/page.tsx` appear in the browser after saving.
+
+- `app/page.tsx`: the home screen.
+- `app/layout.tsx`: the shared HTML document around the page.
+- `app/globals.css`: the page's visual styles.
+- `workout.ts`: workout types and comparison functions, to be connected to the screen later.
+
+Run `npm run typecheck` to check TypeScript and `npm run build` to check that Next.js can build the app.
