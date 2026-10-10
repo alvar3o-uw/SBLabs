@@ -1,155 +1,109 @@
 "use client";
 
 import { useState } from "react";
-
-type EditableSet = {
-  setNum: number;
-  weight: number | "";
-  reps: number | "";
-  rir: number | "";
-};
+import ExerciseBlock from "./ExerciseBlock";
+import type {
+  EditableExerciseInstance,
+  EditableSet,
+} from "./workoutDraft";
 
 export default function HomePage() {
-const [sets, setSets] = useState<EditableSet[]>([  {
-    weight: 0,
-    reps: 0,
-    rir: 0,
-    setNum: 1,
-  },
+
+const [exercises, setExercises] = useState<EditableExerciseInstance[]>([
+  { id: 1, name: "", sets: [] },
 ]);
 
-function updateWeight(setNum: number, weight: number | "") {
-  setSets(
-    sets.map((set) => {
-      if (set.setNum === setNum) {
-        return { ...set, weight: weight };
-      }
+function addExercise() {
+  setExercises((currentExercises) => [
+    ...currentExercises,
+    {
+      id: Math.max(0, ...currentExercises.map((exercise) => exercise.id)) + 1,
+      name: "",
+      sets: [],
+    },
+  ]);
+}
 
-      return set;
-    })
+function removeExercise(id: number) {
+  setExercises((currentExercises) =>
+    currentExercises.filter((exercise) => exercise.id !== id)
   );
 }
 
-function updateReps(setNum: number, reps: number | "") {
-  setSets(
-    sets.map((set) => {
-      if (set.setNum === setNum) {
-        return { ...set, reps: reps };
-      }
-
-      return set;
-    })
+function changeExerciseName(id: number, name: string) {
+  setExercises((currentExercises) =>
+    currentExercises.map((exercise) =>
+      exercise.id === id
+        ? { ...exercise, name: name }
+        : exercise
+    )
   );
 }
 
-function updateRir(setNum: number, rir: number | "") {
-  setSets(
-    sets.map((set) => {
-      if (set.setNum === setNum) {
-        return { ...set, rir: rir };
-      }
-
-      return set;
-    })
+function changeExerciseSets(id: number, sets: EditableSet[]) {
+  setExercises((currentExercises) =>
+    currentExercises.map((exercise) =>
+      exercise.id === id
+        ? { ...exercise, sets: sets }
+        : exercise
+    )
   );
 }
 
-function removeSet(setNum: number) {
-  setSets(
-    sets
-      .filter((set) => set.setNum !== setNum)
-      .map((set, index) => ({
-        ...set,
-        setNum: index + 1,
-      }))
+function isExerciseComplete(exercise: EditableExerciseInstance): boolean {
+  return (
+    exercise.name !== "" &&
+    exercise.sets.length > 0 &&
+    exercise.sets.every((set) => set.confirmed)
   );
 }
+
+function isWorkoutComplete(
+  workoutName: string,
+  exercises: EditableExerciseInstance[] ): boolean {
+  return (
+    workoutName.trim() !== "" &&
+    exercises.length > 0 &&
+    exercises.every(isExerciseComplete)
+  );
+}
+
+const [workoutName, setWorkoutName] = useState("");
+const workoutComplete = isWorkoutComplete(workoutName, exercises);
 
   return (
     <main>
       <p className="brand">SBLabs</p>
-      <h1>My Workout</h1>
+      <h1>
+        <input
+          className="workout-title"
+          aria-label="Workout name"
+          type="text"
+          placeholder="My Workout"
+          value={workoutName}
+          onChange={(event) => setWorkoutName(event.target.value)}
+        />
+      </h1>
 
-      <section aria-labelledby="exercise-name">
-        <h2 id="exercise-name">Cable Curl</h2>
-      {sets.map ((set) => (
-        <div className="set-row" key={set.setNum}>
-          <span>Set {set.setNum}</span>
-          <label>
-            Weight (lbs):
-            <input
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="1"
-              value={set.weight}
-              onChange={(event) => {
-                const value = event.target.value;
-                updateWeight(set.setNum, value === "" ? "" : Number(value));
-              }}
-            />
-          </label>
+      {exercises.map((exercise) => (
+        <ExerciseBlock
+          key={exercise.id}
+          exerciseName={exercise.name}
+          onExerciseChange={(name) => changeExerciseName(exercise.id, name)}
+          onRemove={() => removeExercise(exercise.id)}
+          sets={exercise.sets}
+          onSetsChange={(sets) => changeExerciseSets(exercise.id, sets)}
+        />
+      ))}
 
-          <label>
-            Reps:
-            <input
-              type="number"
-              inputMode="numeric"
-              min="0"
-              step="1"
-              value={set.reps}
-              onChange={(event) => {
-                const value = event.target.value
-                updateReps(set.setNum, value === "" ? "" : Number(value));
-              }}
-            />
-          </label>
+      <button type="button" onClick={addExercise}>
+        Add Exercise
+      </button>
 
-          <label>
-            RIR:
-            <input
-              type="number"
-              inputMode="numeric"
-              min="0"
-              step="1"
-              value={set.rir}
-              onChange={(event) => {
-                const value = event.target.value
-                updateRir(set.setNum, value === "" ? "" : Number(value));
-              }}
-            />
-          </label>
+      <button type="button" disabled={!workoutComplete}>
+        Save Workout
+      </button>
 
-          <button
-            type="button"
-            className="remove-set"
-            aria-label={`Remove set ${set.setNum}`}
-            title={`Remove set ${set.setNum}`}
-            onClick={() => removeSet(set.setNum)}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6" />
-            </svg>
-          </button>
-          </div>))}
-
-        <button
-        type="button"
-        onClick={() => {
-          setSets([
-              ...sets,
-              {
-                weight: 0,
-                reps: 0,
-                rir: 0,
-                setNum: Math.max(0, ...sets.map((set) => set.setNum)) + 1,
-              },
-            ])
-          }}
-        >
-          Add set
-        </button>
-      </section>
     </main>
   );
 }

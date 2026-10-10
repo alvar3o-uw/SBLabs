@@ -31,6 +31,42 @@ h1 {
   line-height: 1.15;
 }
 
+.workout-title {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: #111111;
+  -webkit-text-fill-color: #111111;
+  text-decoration: underline;
+  text-decoration-color: #c7cfdb;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 8px;
+}
+
+.workout-title::placeholder {
+  color: #8793a5;
+  -webkit-text-fill-color: #8793a5;
+  opacity: 1;
+}
+
+.workout-title:not(:placeholder-shown) {
+  text-decoration: none;
+}
+
+.workout-title:focus-visible {
+  outline: 2px solid #0a55d640;
+  outline-offset: 6px;
+  box-shadow: none;
+}
+
 section {
   padding: 28px;
   border: 1px solid #e0e7f1;
@@ -45,13 +81,69 @@ h2 {
   letter-spacing: -0.025em;
 }
 
+.exercise-picker {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 24px;
+}
+
+.exercise-select {
+  appearance: none;
+  field-sizing: content;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 6px 28px 6px 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #18243a;
+  font: inherit;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  cursor: pointer;
+}
+
+.exercise-select:hover { color: #0a55d6; }
+
+.exercise-select:focus-visible {
+  outline: 3px solid #0a55d61a;
+  outline-offset: 4px;
+}
+
+.exercise-chevron {
+  position: absolute;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #0a55d6;
+  pointer-events: none;
+}
+
 .set-row {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)) 44px;
+  grid-template-columns: 58px minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)) repeat(2, 44px);
   align-items: start;
   gap: 16px;
   padding: 20px 0;
   border-top: 1px solid #edf0f5;
+  border-radius: 12px;
+  transition: background 150ms;
+}
+
+.set-row.is-confirmed {
+  background: rgb(35 151 99 / 9%);
+  box-shadow: 0 0 0 1px rgb(35 151 99 / 16%) inset;
+}
+
+.is-confirmed input:disabled {
+  background: rgb(255 255 255 / 65%);
+  border-color: #c8dfd3;
+  opacity: 1;
+  -webkit-text-fill-color: #22543d;
 }
 
 .set-row > span {
@@ -125,12 +217,20 @@ button:hover {
   background: #e0edff;
 }
 
+button:disabled {
+  background: #f1f3f7;
+  border-color: #e3e7ed;
+  color: #8793a5;
+  cursor: not-allowed;
+}
+
 button:focus-visible {
   outline: 3px solid #0a55d6;
   outline-offset: 3px;
 }
 
-.remove-set {
+.remove-set,
+.confirm-set {
   display: grid;
   place-items: center;
   width: 44px;
@@ -139,7 +239,26 @@ button:focus-visible {
   padding: 0;
   border-color: transparent;
   background: transparent;
-  color: #c53643;
+}
+
+.remove-set { color: #c53643; }
+
+.confirm-set {
+  color: #278357;
+  font-size: 1.25rem;
+}
+
+.confirm-set:hover { background: #eaf6ef; }
+
+.confirm-set[aria-pressed="true"] {
+  background: #278357;
+  color: white;
+}
+
+.confirm-set:disabled {
+  color: #9aa6b2;
+  background: transparent;
+  cursor: not-allowed;
 }
 
 .remove-set:hover {
@@ -160,11 +279,48 @@ button:focus-visible {
   }
 
   .set-row {
-    grid-template-columns: 38px minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)) 44px;
-    gap: 8px;
+    grid-template-columns: 34px minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)) repeat(2, 36px);
+    gap: 4px;
   }
+
+  .remove-set,
+  .confirm-set { width: 36px; }
+
+  .set-row label { font-size: 0.7rem; }
 
   input {
     padding: 10px 6px;
   }
+}
+
+main > section + section {
+  margin-top: 20px;
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.exercise-header .exercise-picker {
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.remove-exercise {
+  width: auto;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 8px 10px;
+  border-color: transparent;
+  background: transparent;
+  color: #c53643;
+  font-size: 0.8rem;
+}
+
+.remove-exercise:hover {
+  background: #fff0f1;
 }
