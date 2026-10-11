@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "../lib/supabase/client";
+import { useEffect, useState } from "react";
 import ExerciseBlock from "./ExerciseBlock";
 import type {
   EditableExerciseInstance,
@@ -12,6 +14,8 @@ export default function HomePage() {
 const [exercises, setExercises] = useState<EditableExerciseInstance[]>([
   { id: 1, name: "", sets: [] },
 ]);
+const router = useRouter();
+const [checkingAuth, setCheckingAuth] = useState(true);
 
 function addExercise() {
   setExercises((currentExercises) => [
@@ -71,9 +75,54 @@ function isWorkoutComplete(
 const [workoutName, setWorkoutName] = useState("");
 const workoutComplete = isWorkoutComplete(workoutName, exercises);
 
+async function handleSignOut() {
+  const supabase = createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("Sign-out failed:", error.message);
+    return;
+  }
+
+  router.replace("/login");
+}
+
+useEffect(() => {
+  async function checkUser() {
+    const supabase = createClient();
+
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      router.replace("/login");
+      return;
+    }
+
+    setCheckingAuth(false);
+  }
+
+  checkUser();
+}, [router]);
+
+  if (checkingAuth) {
+    return (
+      <main>
+        <p role="status">Checking your sign-in…</p>
+      </main>
+    );
+  }
+
   return (
     <main>
-      <p className="brand">SBLabs</p>
+      <header className="workout-header">
+        <p className="brand">SBLabs</p>
+        <button className="sign-out" type="button" onClick={handleSignOut}>
+          Sign Out
+        </button>
+      </header>
       <h1>
         <input
           className="workout-title"
